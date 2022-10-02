@@ -28,38 +28,39 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         self.PIN_I_MODBUS_WORDORDER=8
         self.PIN_I_MODBUS_BYTEORDER=9
         self.PIN_I_REG_OFFSET=10
-        self.PIN_I_REGISTER1=11
-        self.PIN_I_REG1_REGTYP=12
-        self.PIN_I_REG1_DATATYPE=13
-        self.PIN_I_REG1_MULTI_LEN=14
-        self.PIN_I_REGISTER2=15
-        self.PIN_I_REG2_REGTYP=16
-        self.PIN_I_REG2_DATATYPE=17
-        self.PIN_I_REG2_MULTI_LEN=18
-        self.PIN_I_REGISTER3=19
-        self.PIN_I_REG3_REGTYP=20
-        self.PIN_I_REG3_DATATYPE=21
-        self.PIN_I_REG3_MULTI_LEN=22
-        self.PIN_I_REGISTER4=23
-        self.PIN_I_REG4_REGTYP=24
-        self.PIN_I_REG4_DATATYPE=25
-        self.PIN_I_REG4_MULTI_LEN=26
-        self.PIN_I_REGISTER5=27
-        self.PIN_I_REG5_REGTYP=28
-        self.PIN_I_REG5_DATATYPE=29
-        self.PIN_I_REG5_MULTI_LEN=30
-        self.PIN_I_REGISTER6=31
-        self.PIN_I_REG6_REGTYP=32
-        self.PIN_I_REG6_DATATYPE=33
-        self.PIN_I_REG6_MULTI_LEN=34
-        self.PIN_I_REGISTER7=35
-        self.PIN_I_REG7_REGTYP=36
-        self.PIN_I_REG7_DATATYPE=37
-        self.PIN_I_REG7_MULTI_LEN=38
-        self.PIN_I_REGISTER8=39
-        self.PIN_I_REG8_REGTYP=40
-        self.PIN_I_REG8_DATATYPE=41
-        self.PIN_I_REG8_MULTI_LEN=42
+        self.PIN_I_ENABLE_DEBUG=11
+        self.PIN_I_REGISTER1=12
+        self.PIN_I_REG1_REGTYP=13
+        self.PIN_I_REG1_DATATYPE=14
+        self.PIN_I_REG1_MULTI_LEN=15
+        self.PIN_I_REGISTER2=16
+        self.PIN_I_REG2_REGTYP=17
+        self.PIN_I_REG2_DATATYPE=18
+        self.PIN_I_REG2_MULTI_LEN=19
+        self.PIN_I_REGISTER3=20
+        self.PIN_I_REG3_REGTYP=21
+        self.PIN_I_REG3_DATATYPE=22
+        self.PIN_I_REG3_MULTI_LEN=23
+        self.PIN_I_REGISTER4=24
+        self.PIN_I_REG4_REGTYP=25
+        self.PIN_I_REG4_DATATYPE=26
+        self.PIN_I_REG4_MULTI_LEN=27
+        self.PIN_I_REGISTER5=28
+        self.PIN_I_REG5_REGTYP=29
+        self.PIN_I_REG5_DATATYPE=30
+        self.PIN_I_REG5_MULTI_LEN=31
+        self.PIN_I_REGISTER6=32
+        self.PIN_I_REG6_REGTYP=33
+        self.PIN_I_REG6_DATATYPE=34
+        self.PIN_I_REG6_MULTI_LEN=35
+        self.PIN_I_REGISTER7=36
+        self.PIN_I_REG7_REGTYP=37
+        self.PIN_I_REG7_DATATYPE=38
+        self.PIN_I_REG7_MULTI_LEN=39
+        self.PIN_I_REGISTER8=40
+        self.PIN_I_REG8_REGTYP=41
+        self.PIN_I_REG8_DATATYPE=42
+        self.PIN_I_REG8_MULTI_LEN=43
         self.PIN_O_FETCH_OK=1
         self.PIN_O_REG1_VAL_NUM=2
         self.PIN_O_REG1_VAL_STR=3
@@ -83,7 +84,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
 #### Own written code can be placed after this commentblock . Do not change or delete commentblock! ####
 ###################################################################################################!!!##
 
-        self.DEBUG = self.FRAMEWORK.create_debug_section()
+        self.DEBUG = None
         self.interval = None
         self.client = None
         self.data_types = {
@@ -101,7 +102,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             'string': {'size': -1, 'numeric': False, 'method': 'decode_string'}
         }
         self.options = {
-            'NoKeepAlive', 'Sleep100ms', 'ReconnectAfterEachRead'
+            'NoKeepAlive', 'Sleep100ms', 'Sleep500ms', 'ReconnectAfterEachRead'
         }
 
     def on_interval(self):
@@ -111,7 +112,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         unit_id = int(self._get_input_value(self.PIN_I_SLAVE_ID))
 
         try:
-            self.DEBUG.set_value("Conn IP:Port (UnitID)", ip_address + ":" + str(port) + " (" + str(unit_id) + ") ")
+            self.log_debug("Conn IP:Port (UnitID)", ip_address + ":" + str(port) + " (" + str(unit_id) + ") ")
             if self.client is None:
                 self.client = ModbusTcpClient(ip_address, port, timeout=10, retry_on_empty=True, retry_on_invalid=True,
                     reset_socket=False)
@@ -133,10 +134,10 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             self.fetch_register(8, self.PIN_I_REGISTER8, self.PIN_I_REG8_REGTYP, self.PIN_I_REG8_DATATYPE,
                                 self.PIN_I_REG8_MULTI_LEN, self.PIN_O_REG8_VAL_NUM, self.PIN_O_REG8_VAL_STR, unit_id)
         except ConnectionException as con_err:
-            self.DEBUG.set_value("Last exception msg logged", "Message: " + str(con_err))
+            self.log_debug("Last exception msg logged", "Message: " + str(con_err))
             self.LOGGER.warning("Unable to read modbus register: " + str(con_err))
         except Exception as err:
-            self.DEBUG.set_value("Last perm exception msg logged", "Message: " + str(err))
+            self.log_debug("Last perm exception msg logged", "Message: " + str(err))
             self.LOGGER.error("Unable to read modbus register. Perm error: " + str(err))
             raise
         finally:
@@ -145,8 +146,8 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         # No exception raised and maybe connection closed: Lets notify the next module
         self._set_output_value(self.PIN_O_FETCH_OK, 1)
 
-    def fetch_register(self, input_num, input_addr_id, input_reg_read_type, input_reg_datatype, multiplier_fetchsize,
-                       pin_output_num_id, pin_output_str_id, unit_id):
+    def fetch_register(self, input_num, input_addr_id, input_reg_read_type, input_reg_datatype,
+                       multiplier_fetchsize_input, pin_output_num_id, pin_output_str_id, unit_id):
 
         self.client.connect()
 
@@ -164,15 +165,14 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                 return None
 
             register_read_type = self._get_input_value(input_reg_read_type)
-            register_type_str = self._get_input_value(input_reg_datatype)
-            register_settings = self.data_types.get(register_type_str)
+            register_settings = self.data_types.get(self._get_input_value(input_reg_datatype))
             if register_settings is None:  # No matching type entry found. lets skip over
-                self.DEBUG.set_value("No matching data type found: ", register_type_str)
+                self.log_debug("No matching data type found: ", self._get_input_value(input_reg_datatype))
                 return None
 
             reg_fetch_size = int(register_settings.get('size'))
             if reg_fetch_size == -1:  # Strings have individual length
-                reg_fetch_size = self._get_input_value(multiplier_fetchsize)
+                reg_fetch_size = self._get_input_value(multiplier_fetchsize_input)
 
             if register_read_type == 1:
                 result = self.client.read_coils(register_addr, unit=unit_id)
@@ -188,33 +188,35 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
 
             if result.isError():
                 self.LOGGER.error("Unable to read Modbus register " + str(register_addr) + ": " + str(result))
-                self.DEBUG.set_value("Output value " + str(input_num) + " with address " + str(register_addr)
-                                     + " of type " + register_type_str, str(result))
+                self.log_debug("Output value " + str(input_num) + " with address " + str(register_addr)
+                               + " of type " + self._get_input_value(input_reg_datatype), str(result))
                 return None
-
-            if register_read_type != 1:
-                decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=self.byte_order(),
-                                                         wordorder=self.word_order())
 
             if register_read_type == 1:
                 # fetch coils (true/false)
                 value = result.bits[0]
                 self._set_output_value(pin_output_num_id, int(value))
-            elif register_settings.get('numeric') is True:
-                # Fetch values. Num-Values written in num and str output, Strings only as in str output.
-                value = getattr(decoder, register_settings.get('method'))()
-                value *= self._get_input_value(multiplier_fetchsize)
-                self._set_output_value(pin_output_num_id, value)
             else:
-                # Strings must fetched with individual length
-                value = getattr(decoder, register_settings.get('method'))(reg_fetch_size)
-                value = value.replace('\x00', '')  # Remove null bytes
+                decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=self.byte_order(),
+                                                         wordorder=self.word_order())
+                if register_settings.get('numeric'):
+                    # Fetch values. Num-Values written in num and str output, Strings only as in str output.
+                    raw_value = getattr(decoder, register_settings.get('method'))()
+                    value = raw_value * self._get_input_value(multiplier_fetchsize_input)
+                    self._set_output_value(pin_output_num_id, value)
+                else:
+                    # Strings fetched with individual length
+                    raw_value = getattr(decoder, register_settings.get('method'))(reg_fetch_size)
+                    value = raw_value.replace('\x00', '')  # Remove null bytes
 
-            self.DEBUG.set_value("Output value " + str(input_num) + " of type " + register_type_str, str(value))
-            self._set_output_value(pin_output_str_id, str(value))
+            self.log_debug("Raw value " + str(input_num) + " of type " + self._get_input_value(input_reg_datatype),
+                           str(raw_value))
+            self._set_output_value(pin_output_str_id, str(value))  # We set string for num and str registers.
 
             if self.is_option_set('Sleep100ms'):  # Sleep 100ms to let slow pairs calm down
                 time.sleep(0.1)
+            if self.is_option_set('Sleep500ms'):  # Sleep 100ms to let slow pairs calm down
+                time.sleep(0.5)
         finally:
             if self.is_option_set('ReconnectAfterEachRead'):
                 self.client.close()
@@ -233,23 +235,22 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
 
     def on_init(self):
         self.interval = self.FRAMEWORK.create_interval()
-        if self._get_input_value(self.PIN_I_SWITCH) == 1:
+        if bool(self._get_input_value(self.PIN_I_SWITCH)):
             self.interval.set_interval(self._get_input_value(self.PIN_I_FETCH_INTERVAL) * 1000, self.on_interval)
             self.interval.start()
 
     def on_input_value(self, index, value):
         if index == self.PIN_I_SWITCH:
             self.interval.stop()
-            if value == 1:
+            if bool(value):
                 self.interval.set_interval(self._get_input_value(self.PIN_I_FETCH_INTERVAL) * 1000, self.on_interval)
                 self.interval.start()
         elif index == self.PIN_I_FETCH_INTERVAL:
             self.interval.stop()
             self.interval.set_interval(self._get_input_value(self.PIN_I_FETCH_INTERVAL) * 1000, self.on_interval)
-            if self._get_input_value(self.PIN_I_SWITCH) == 1:
+            if bool(self._get_input_value(self.PIN_I_SWITCH)):
                 self.interval.start()
-        elif index == self.PIN_I_MAN_TRIGGER:
-            if self._get_input_value(self.PIN_I_MAN_TRIGGER) == 1:
+        elif index == self.PIN_I_MAN_TRIGGER and bool(value):
                 self.on_interval()
 
     def is_option_set(self, option):
@@ -257,3 +258,10 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         if option.lower() in current_options.lower():
             return True
         return False
+
+    def log_debug(self, key, value):
+        if bool(self._get_input_value(self.PIN_I_ENABLE_DEBUG)):
+            if not self.DEBUG:
+                self.DEBUG = self.FRAMEWORK.create_debug_section()
+
+            self.DEBUG.set_value(str(key), str(value))
