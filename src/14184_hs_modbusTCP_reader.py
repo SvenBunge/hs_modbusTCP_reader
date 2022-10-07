@@ -212,14 +212,14 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             self.log_debug("Raw value " + str(input_num) + " of type " + self._get_input_value(input_reg_datatype),
                            str(raw_value))
             self._set_output_value(pin_output_str_id, str(value))  # We set string for num and str registers.
-
-            if self.is_option_set('Sleep100ms'):  # Sleep 100ms to let slow pairs calm down
-                time.sleep(0.1)
-            if self.is_option_set('Sleep500ms'):  # Sleep 100ms to let slow pairs calm down
-                time.sleep(0.5)
         finally:
             if self.is_option_set('ReconnectAfterEachRead'):
                 self.client.close()
+
+        if self.is_option_set('Sleep100ms'):  # Sleep 100ms to let slow pairs calm down
+            time.sleep(0.1)
+        if self.is_option_set('Sleep500ms'):  # Sleep 100ms to let slow pairs calm down
+            time.sleep(0.5)
 
     def word_order(self):
         if int(self._get_input_value(self.PIN_I_MODBUS_WORDORDER)) == 1:
