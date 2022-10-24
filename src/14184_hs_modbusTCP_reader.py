@@ -102,7 +102,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             'string': {'size': -1, 'numeric': False, 'method': 'decode_string'}
         }
         self.options = {
-            'NoKeepAlive', 'Sleep100ms', 'Sleep500ms', 'ReconnectAfterEachRead'
+            'KeepAlive', 'Sleep100ms', 'Sleep500ms', 'ReconnectAfterEachRead'
         }
 
     def on_interval(self):
@@ -141,7 +141,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             self.LOGGER.error("Unable to read modbus register. Perm error: " + str(err))
             raise
         finally:
-            if self.is_option_set('NoKeepAlive'):
+            if not self.is_option_set('KeepAlive'):
                 self.client.close()
         # No exception raised and maybe connection closed: Lets notify the next module
         self._set_output_value(self.PIN_O_FETCH_OK, 1)
