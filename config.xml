@@ -9,7 +9,7 @@
                 <input type="string" const_name="modbus_slave_ip" init_value="127.0.0.1">IP of modbus server</input>
                 <input type="number" const_name="port" init_value="502">Modbus TCP Port (default: 502)</input>
                 <input type="number" const_name="slave-id" init_value="1">Modbus slave id</input>
-                <input type="string" const_name="options" init_value="">Special options if needed, sep. by colon. Options: NoKeepAlive,Sleep100ms</input>
+                <input type="string" const_name="options" init_value="">Special options if needed, sep. by colon. Options see docu.</input>
                 <input type="number" const_name="modbus_wordorder" init_value="0">Word order: 0: LittleEndian (Modbus default); 1: BigEndian</input>
                 <input type="number" const_name="modbus_byteorder" init_value="1">Byte order: 0: LittleEndian; 1: BigEndian (Modbus default)</input>
                 <input type="number" const_name="reg_offset" init_value="0">Register offset: Shifts all registers. Default 0, often -1</input>

@@ -177,7 +177,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             if register_read_type == 1:
                 result = self.client.read_coils(register_addr, unit=unit_id)
             elif register_read_type == 2:
-                result = self.client.read_discrete_inputs(register_addr, reg_fetch_size, unit=unit_id)
+                result = self.client.read_discrete_inputs(register_addr, unit=unit_id)
             elif register_read_type == 3:
                 result = self.client.read_holding_registers(register_addr, reg_fetch_size, unit=unit_id)
             elif register_read_type == 4:
@@ -192,11 +192,13 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                                + " of type " + self._get_input_value(input_reg_datatype), str(result))
                 return None
 
-            if register_read_type == 1:
-                # fetch coils (true/false)
+            if register_read_type == 1 or register_read_type == 2:
+                # fetch coils / discrete registers (true/false)
+                raw_value = result.bits
                 value = result.bits[0]
                 self._set_output_value(pin_output_num_id, int(value))
             else:
+                # multi byte registers
                 decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=self.byte_order(),
                                                          wordorder=self.word_order())
                 if register_settings.get('numeric'):
