@@ -3,7 +3,7 @@ Gira Homeserver 4 Logicmodule to poll/fetch values via Modbus TCP.
 
 ## Developer Notes
 
-Developed for the GIRA HomeServer 4.10 / 4.11!
+Developed for the GIRA HomeServer 4.11 (Could work >4.7)
 Licensed under the LGPL to keep all copies & forks free!
 
 :exclamation: **If you fork this project and distribute the module by your own CHANGE the Logikbaustein-ID because 14184 is only for this one and registered to @SvenBunge !!** :exclamation:
@@ -38,7 +38,8 @@ You can replace step 4 with the `./buildRelease.sh` script. With the help of the
  
 ## Libraries
 
-* pymodbus 2.5.3 - https://github.com/riptideio/pymodbus 
+* pymodbus 2.5.3 - https://github.com/riptideio/pymodbus
+* serial 3.5 - https://github.com/pyserial/pyserial
 * six (in pymodbus folder) 1.16.0 - https://github.com/benjaminp/six
 
 The shipped libraries may distributed under a different license conditions. Respect those licenses as well!

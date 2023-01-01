@@ -254,6 +254,11 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                 self.interval.start()
         elif index == self.PIN_I_MAN_TRIGGER and bool(value):
                 self.on_interval()
+        elif index == self.PIN_I_MODBUS_SLAVE_IP or index == self.PIN_I_PORT or index == self.PIN_I_SLAVE_ID:
+            # Reset client. Is then regenerated with new values on next run.
+            if self.client:
+                self.client.close()
+            self.client = None
 
     def is_option_set(self, option):
         current_options = self._get_input_value(self.PIN_I_OPTIONS)
