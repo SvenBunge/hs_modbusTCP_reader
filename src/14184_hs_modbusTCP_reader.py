@@ -214,6 +214,13 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             self.log_debug("Raw value " + str(input_num) + " of type " + self._get_input_value(input_reg_datatype),
                            str(raw_value))
             self._set_output_value(pin_output_str_id, str(value))  # We set string for num and str registers.
+        except Exception as e:
+            if bool(self._get_input_value(self.PIN_I_ENABLE_DEBUG)):
+                self.log_debug("Error values:", str(input_num) + '/' + str(self.PIN_I_REG8_REGTYP) + '/' +
+                               str(self.PIN_I_REG8_DATATYPE) + '/' + str(multiplier_fetchsize_input))
+
+                raise
+            # Do nothing / just catching if not in Debug mode
         finally:
             if self.is_option_set('ReconnectAfterEachRead'):
                 self.client.close()
