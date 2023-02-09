@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
     <modules>
-        <module category="Datenaustausch" context="hs_modbusTCP_reader14184" id="14184" name="hs_modbusTCP_reader" sinternal_name="hs_modbusTCP_reader" external_name="ModbusTCP Reader (14184)" version="1.1">
+        <module category="Datenaustausch" context="hs_modbusTCP_reader14184" id="14184" name="hs_modbusTCP_reader" sinternal_name="hs_modbusTCP_reader" external_name="ModbusTCP Reader (14184)" version="1.2">
             <inputs>
                 <input type="number" const_name="switch" init_value="0">Interval timer switch - on (1) / off (0)</input>
                 <input type="number" const_name="fetch_interval" init_value="10">Interval in seconds (default: 10 secs)</input>

@@ -114,8 +114,8 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         try:
             self.log_debug("Conn IP:Port (UnitID)", ip_address + ":" + str(port) + " (" + str(unit_id) + ") ")
             if self.client is None:
-                self.client = ModbusTcpClient(ip_address, port, timeout=10, retry_on_empty=True, retry_on_invalid=True,
-                    reset_socket=False)
+                self.client = ModbusTcpClient(ip_address, port, timeout=15, retry_on_empty=True, retry_on_invalid=True,
+                    reset_socket=False)  # reset_socket=true caused some issues with devices
 
             self.fetch_register(1, self.PIN_I_REGISTER1, self.PIN_I_REG1_REGTYP, self.PIN_I_REG1_DATATYPE,
                                 self.PIN_I_REG1_MULTI_LEN, self.PIN_O_REG1_VAL_NUM, self.PIN_O_REG1_VAL_STR, unit_id)
@@ -136,13 +136,21 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         except ConnectionException as con_err:
             self.log_debug("Last exception msg logged", "Message: " + str(con_err))
             self.LOGGER.warning("Unable to read modbus register: " + str(con_err))
+            self.client = None  # Restart with fresh client!
         except Exception as err:
             self.log_debug("Last perm exception msg logged", "Message: " + str(err))
             self.LOGGER.error("Unable to read modbus register. Perm error: " + str(err))
-            raise
-        finally:
-            if not self.is_option_set('KeepAlive'):
+            if self.client:
                 self.client.close()
+                self.client = None  # Restart with fresh client!
+            # Throw exception only if in debug mode
+            if bool(self._get_input_value(self.PIN_I_ENABLE_DEBUG)):
+                raise
+        finally:
+            if self.client and not self.is_option_set('KeepAlive'):
+                self.client.close()
+                # Let's drop the client without keepalive to start with new client. Had an issue at 4.2.2023
+                self.client = None
         # No exception raised and maybe connection closed: Lets notify the next module
         self._set_output_value(self.PIN_O_FETCH_OK, 1)
 
