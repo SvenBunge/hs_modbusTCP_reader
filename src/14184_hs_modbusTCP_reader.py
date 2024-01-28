@@ -102,7 +102,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             'string': {'size': -1, 'numeric': False, 'method': 'decode_string'}
         }
         self.options = {
-            'KeepAlive', 'Sleep100ms', 'Sleep500ms', 'ReconnectAfterEachRead'
+            'KeepAlive', 'Sleep100ms', 'Sleep500ms', 'Sleep1s', 'Sleep2s', 'ReconnectAfterEachRead'
         }
 
     def on_interval(self):
@@ -235,8 +235,12 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
 
         if self.is_option_set('Sleep100ms'):  # Sleep 100ms to let slow pairs calm down
             time.sleep(0.1)
-        if self.is_option_set('Sleep500ms'):  # Sleep 100ms to let slow pairs calm down
+        if self.is_option_set('Sleep500ms'):  # Sleep 500ms to let slow pairs calm down
             time.sleep(0.5)
+        if self.is_option_set('Sleep1s'): # Sleep 1s to let slow pairs calm down
+            time.sleep(1)
+        if self.is_option_set('Sleep2s'): # Sleep 1s to let slow pairs calm down
+            time.sleep(2)
 
     def word_order(self):
         if int(self._get_input_value(self.PIN_I_MODBUS_WORDORDER)) == 1:
