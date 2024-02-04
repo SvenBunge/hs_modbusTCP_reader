@@ -12,12 +12,12 @@ from pymodbus.exceptions import ConnectionException
 ########################################################################################################
 ##** Code created by generator - DO NOT CHANGE! **##
 
-class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
+class Hs_modbusTCP_reader14184(hsl20_4.BaseModule):
 
     def __init__(self, homeserver_context):
-        hsl20_3.BaseModule.__init__(self, homeserver_context, "hs_modbusTCP_reader14184")
+        hsl20_4.BaseModule.__init__(self, homeserver_context, "hs_modbusTCP_reader14184")
         self.FRAMEWORK = self._get_framework()
-        self.LOGGER = self._get_logger(hsl20_3.LOGGING_NONE,())
+        self.LOGGER = self._get_logger(hsl20_4.LOGGING_NONE,())
         self.PIN_I_SWITCH=1
         self.PIN_I_FETCH_INTERVAL=2
         self.PIN_I_MAN_TRIGGER=3
@@ -78,7 +78,6 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
         self.PIN_O_REG7_VAL_STR=15
         self.PIN_O_REG8_VAL_NUM=16
         self.PIN_O_REG8_VAL_STR=17
-        self.FRAMEWORK._run_in_context_thread(self.on_init)
 
 ########################################################################################################
 #### Own written code can be placed after this commentblock . Do not change or delete commentblock! ####
@@ -152,7 +151,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                 # Let's drop the client without keepalive to start with new client. Had an issue at 4.2.2023
                 self.client = None
         # No exception raised and maybe connection closed: Lets notify the next module
-        self._set_output_value(self.PIN_O_FETCH_OK, 1)
+        self.write_output(self.PIN_O_FETCH_OK, 1)
 
     def fetch_register(self, input_num, input_addr_id, input_reg_read_type, input_reg_datatype,
                        multiplier_fetchsize_input, pin_output_num_id, pin_output_str_id, unit_id):
@@ -204,7 +203,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                 # fetch coils / discrete registers (true/false)
                 raw_value = result.bits
                 value = result.bits[0]
-                self._set_output_value(pin_output_num_id, int(value))
+                self.write_output(pin_output_num_id, int(value))
             else:
                 # multi byte registers
                 decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=self.byte_order(),
@@ -213,7 +212,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
                     # Fetch values. Num-Values written in num and str output, Strings only as in str output.
                     raw_value = getattr(decoder, register_settings.get('method'))()
                     value = raw_value * self._get_input_value(multiplier_fetchsize_input)
-                    self._set_output_value(pin_output_num_id, value)
+                    self.write_output(pin_output_num_id, value)
                 else:
                     # Strings fetched with individual length
                     raw_value = getattr(decoder, register_settings.get('method'))(reg_fetch_size)
@@ -221,7 +220,7 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
 
             self.log_debug("Raw value " + str(input_num) + " of type " + self._get_input_value(input_reg_datatype),
                            str(raw_value))
-            self._set_output_value(pin_output_str_id, str(value))  # We set string for num and str registers.
+            self.write_output(pin_output_str_id, str(value))  # We set string for num and str registers.
         except Exception as e:
             if bool(self._get_input_value(self.PIN_I_ENABLE_DEBUG)):
                 self.log_debug("Error values:", str(input_num) + '/' + str(self.PIN_I_REG8_REGTYP) + '/' +
@@ -253,6 +252,10 @@ class Hs_modbusTCP_reader14184(hsl20_3.BaseModule):
             return Endian.Big
         else:
             return Endian.Little
+
+    def write_output(self, pin_output_num_id, value):
+        if self._can_set_output(): # Check if output queue of HS is not full
+            self._set_output_value(pin_output_num_id, value)
 
     def on_init(self):
         self.interval = self.FRAMEWORK.create_interval()
